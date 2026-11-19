@@ -31,10 +31,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Gupkagrop/important-project"
-Repository = "https://github.com/Gupkagrop/important-project.git"
-Issues = "https://github.com/Gupkagrop/important-project/issues"
-Changelog = "https://github.com/Gupkagrop/important-project/blob/main/ROADMAP.md"
+Homepage = "https://github.com/Gupkagrop/gupkagropy"
+Repository = "https://github.com/Gupkagrop/gupkagropy.git"
+Issues = "https://github.com/Gupkagrop/gupkagropy/issues"
+Changelog = "https://github.com/Gupkagrop/gupkagropy/blob/main/ROADMAP.md"
 
 [build-system]
 requires = ["uv_build>=0.12.15,<0.13.0"]

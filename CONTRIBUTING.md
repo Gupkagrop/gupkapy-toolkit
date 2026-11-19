@@ -19,8 +19,8 @@
 
 ```bash
 # Клонирование репозитория
-git clone https://github.com/Gupkagrop/important-project.git
-cd important-project
+git clone https://github.com/Gupkagrop/gupkagropy.git
+cd gupkagropy
 
 # Синхронизация зависимостей разработки
 uv sync
