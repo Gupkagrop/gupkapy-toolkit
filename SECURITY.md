@@ -17,7 +17,7 @@
 
 1. **Не создавайте публичный Issue.**
 2. Воспользуйтесь приватной формой сообщения об уязвимости на GitHub:  
-   👉 [Report a vulnerability](https://github.com/Gupkagrop/gupkagropy/security/advisories/new)
+   👉 [Report a vulnerability](https://github.com/Gupkagrop/gupkapy-toolkit/security/advisories/new)
 3. Либо отправьте письмо автору на электронную почту: [denislopuhov3@gmail.com](mailto:denislopuhov3@gmail.com) с темой `[SECURITY] Уязвимость в pocket-toolkit`.
 
 ### Необходимая информация

@@ -906,43 +906,6 @@ def __repr__(self) -> str
 3.14
 </file>
 
-<file path="AGENTS.md">
-> [!NOTE]
-> Данный файл определяет архитектурный контракт, правила оформления кода, стандарты коммитов и регламент ежедневного инкрементального развития библиотеки `pocket-toolkit`. Все агенты обязаны следовать инструкциям при добавлении новых компонентов.
-
-# Pocket Toolkit — Operational Contract & Guidelines
-
-## 1. Project Overview
-`pocket-toolkit` is a modular, zero-dependency Python utility and data structure library built for modern Python (>=3.12).
-The project evolves through daily, bite-sized, atomic feature increments tracked in [ROADMAP.md](file:///c:/Users/denis/Documents/antigravity/GitHub%20Activity/ROADMAP.md).
-
-## 2. Tech Stack & Environment
-- **Runtime:** Python >= 3.12
-- **Package Manager:** `uv`
-- **Testing:** `pytest`
-- **Git Remote:** `Gupkagrop` (`https://github.com/Gupkagrop/gupkagropy.git`)
-- **Main Branch:** `main`
-
-## 3. Code Standards & Architecture
-- **Language & Comments:** All code symbols (classes, functions, variables, files) must be in English. All docstrings, inline comments, and annotations MUST be in Russian.
-- **Strict Typing:** Every function signature and class attribute must include explicit type hints (`typing.Any` is strictly prohibited). Use generics (`TypeVar`, `Generic`) where appropriate.
-- **Complexity & Flat Flow:** Adhere to early returns (maximum 3 levels of nesting).
-- **Single Responsibility:** Functions must stay within 30-40 lines; break down complex logic into private helper functions (`_helper_func`).
-- **Zero Placeholders:** Never commit mocks, placeholders, or unfinished `TODO` markers. Every added component must be 100% production-ready.
-
-## 4. Daily Increment Workflow (Automation Protocol)
-On each automated daily run:
-1. Open [ROADMAP.md](file:///c:/Users/denis/Documents/antigravity/GitHub%20Activity/ROADMAP.md) and pick the next uncompleted task `[ ]`.
-2. Implement the designated module inside `src/pocket_toolkit/<category>/<module_name>.py`.
-3. Export public symbols in `src/pocket_toolkit/__init__.py` and the respective subpackage `__init__.py`.
-4. Create comprehensive unit tests in `tests/test_<module_name>.py` covering standard cases, edge cases, and error handling.
-5. Run test suite: `uv run pytest`.
-6. Mark the task as done `[x]` in `ROADMAP.md`.
-7. Commit changes strictly in Russian using Conventional Commits format:
-   - Example: `feat(structures): реализовать кольцевой буфер и модульные тесты`
-8. Push commits to GitHub: `git push Gupkagrop main`.
-</file>
-
 <file path=".github/ISSUE_TEMPLATE/feature_request.md">
 ---
 name: Запрос новой функциональности
@@ -3957,6 +3920,256 @@ def __eq__(self, other: object) -> bool
         """
 </file>
 
+<file path="src/pocket_toolkit/structures/lfu_cache.py">
+"""Реализация кэша вытеснения по частоте использования (LFU Cache) с временем доступа O(1)."""
+⋮----
+class _LFUEntry[K, V]
+⋮----
+"""Внутренний контейнер для хранения ключа, значения и частоты обращения."""
+⋮----
+__slots__ = ("freq", "key", "value")
+⋮----
+def __init__(self, key: K, value: V, freq: int = 1) -> None
+⋮----
+"""Инициализирует запись кэша LFU.
+
+        :param key: Ключ элемента.
+        :param value: Значение элемента.
+        :param freq: Начальная частота обращения.
+        """
+⋮----
+def __repr__(self) -> str
+⋮----
+"""Строковое представление записи LFU."""
+⋮----
+class LFUCache[K, V]
+⋮----
+"""Кэш вытеснения по частоте использования (Least Frequently Used Cache).
+
+    Обеспечивает алгоритмическую сложность основных операций O(1) за счет
+    комбинации хэш-таблицы (словаря) ключей и словаря двусвязных списков,
+    группирующих элементы по частоте их вызова. При равенстве частот
+    вытесняется наименее недавно использованный элемент (LRU).
+    """
+⋮----
+"""Инициализирует кэш заданной максимальной вместимости.
+
+        :param capacity: Максимальное количество элементов (должно быть строго > 0).
+        :param initial_items: Опциональная последовательность начальных пар (ключ, значение).
+        :raises ValueError: Если вместимость меньше либо равна нулю.
+        """
+⋮----
+@property
+    def capacity(self) -> int
+⋮----
+"""Возвращает максимальную вместимость кэша."""
+⋮----
+@property
+    def size(self) -> int
+⋮----
+"""Возвращает текущее количество сохраненных элементов."""
+⋮----
+@property
+    def hits(self) -> int
+⋮----
+"""Возвращает количество успешных обращений к кэшу."""
+⋮----
+@property
+    def misses(self) -> int
+⋮----
+"""Возвращает количество промахов мимо кэша."""
+⋮----
+@property
+    def hit_ratio(self) -> float
+⋮----
+"""Возвращает долю попаданий в кэш от общего числа запросов."""
+total_requests: int = self._hits + self._misses
+⋮----
+@property
+    def min_freq(self) -> int
+⋮----
+"""Возвращает текущую минимальную частоту элементов в кэше."""
+⋮----
+def is_empty(self) -> bool
+⋮----
+"""Проверяет, пуст ли кэш."""
+⋮----
+def is_full(self) -> bool
+⋮----
+"""Проверяет, заполнен ли кэш до предельной вместимости."""
+⋮----
+def _increment_freq(self, node: DoublyNode[_LFUEntry[K, V]]) -> None
+⋮----
+"""Вспомогательный метод увеличения частоты обращения к узлу за O(1)."""
+entry: _LFUEntry[K, V] = node.value
+old_freq: int = entry.freq
+freq_list: DoublyLinkedList[_LFUEntry[K, V]] = self._freq_map[old_freq]
+⋮----
+new_freq: int = entry.freq
+⋮----
+def _evict_lfu(self) -> _LFUEntry[K, V]
+⋮----
+"""Вспомогательный метод вытеснения наименее часто используемого элемента."""
+freq_list: DoublyLinkedList[_LFUEntry[K, V]] = self._freq_map[self._min_freq]
+evicted_entry: _LFUEntry[K, V] = freq_list.pop()
+⋮----
+def put(self, key: K, value: V) -> None
+⋮----
+"""Помещает пару ключ-значение в кэш.
+
+        Если ключ существует, обновляет значение и увеличивает его частоту.
+        Если кэш заполнен, вытесняет элемент с наименьшей частотой (LFU/LRU).
+
+        :param key: Ключ элемента.
+        :param value: Значение элемента.
+        """
+⋮----
+node: DoublyNode[_LFUEntry[K, V]] = self._lookup[key]
+⋮----
+entry: _LFUEntry[K, V] = _LFUEntry(key, value, freq=1)
+⋮----
+new_node: DoublyNode[_LFUEntry[K, V]] = self._freq_map[1].prepend(entry)
+⋮----
+def get(self, key: K, default: V | None = None) -> V | None
+⋮----
+"""Возвращает значение по ключу, увеличивая счетчик его частоты обращения.
+
+        :param key: Искомый ключ.
+        :param default: Значение по умолчанию, если ключ отсутствует.
+        :return: Значение элемента или default.
+        """
+⋮----
+def get_frequency(self, key: K) -> int | None
+⋮----
+"""Возвращает текущую частоту обращения к ключу.
+
+        :param key: Искомый ключ.
+        :return: Частота обращения к ключу или None, если ключ отсутствует.
+        """
+⋮----
+def peek(self, key: K, default: V | None = None) -> V | None
+⋮----
+"""Возвращает значение по ключу без изменения частоты и статистики.
+
+        :param key: Искомый ключ.
+        :param default: Значение по умолчанию, если ключ отсутствует.
+        :return: Значение элемента или default.
+        """
+⋮----
+def peek_lfu(self) -> tuple[K, V] | None
+⋮----
+"""Возвращает парный кандидат на вытеснение (ключ, значение) без его удаления.
+
+        :return: Кортеж (ключ, значение) или None, если кэш пуст.
+        """
+⋮----
+tail_node: DoublyNode[_LFUEntry[K, V]] | None = freq_list.tail_node
+⋮----
+def pop(self, key: K) -> V
+⋮----
+"""Извлекает и удаляет элемент по ключу из кэша.
+
+        :param key: Ключ удаляемого элемента.
+        :return: Значение удаленного элемента.
+        :raises KeyError: Если ключ не найден в кэше.
+        """
+⋮----
+node: DoublyNode[_LFUEntry[K, V]] = self._lookup.pop(key)
+⋮----
+freq_list: DoublyLinkedList[_LFUEntry[K, V]] = self._freq_map[entry.freq]
+⋮----
+def pop_lfu(self) -> tuple[K, V]
+⋮----
+"""Удаляет и возвращает наименее часто и наименее недавно использованный элемент.
+
+        :return: Кортеж (ключ, значение) вытесненного элемента.
+        :raises KeyError: Если кэш пуст.
+        """
+⋮----
+evicted: _LFUEntry[K, V] = self._evict_lfu()
+⋮----
+def delete(self, key: K) -> bool
+⋮----
+"""Безопасно удаляет элемент по ключу.
+
+        :param key: Удаляемый ключ.
+        :return: True, если элемент присутствовал и был удален; False в противном случае.
+        """
+⋮----
+def resize(self, new_capacity: int) -> int
+⋮----
+"""Изменяет максимальную вместимость кэша.
+
+        Если новая вместимость меньше текущего размера, вытесняет элементы LFU.
+
+        :param new_capacity: Новая вместимость кэша (строго > 0).
+        :return: Количество вытесненных элементов.
+        :raises ValueError: Если new_capacity <= 0.
+        """
+⋮----
+evicted_count: int = 0
+⋮----
+def clear(self, reset_stats: bool = False) -> None
+⋮----
+"""Очищает кэш от всех элементов.
+
+        :param reset_stats: Сбрасывать ли счетчики попаданий и промахов.
+        """
+⋮----
+def reset_stats(self) -> None
+⋮----
+"""Сбрасывает счетчики попаданий и промахов к нулю."""
+⋮----
+def items(self) -> list[tuple[K, V]]
+⋮----
+"""Возвращает список пар (ключ, значение) по убыванию частоты обращения."""
+result: list[tuple[K, V]] = []
+⋮----
+freq_list: DoublyLinkedList[_LFUEntry[K, V]] = self._freq_map[freq]
+⋮----
+def keys(self) -> list[K]
+⋮----
+"""Возвращает список ключей по убыванию частоты обращения."""
+⋮----
+def values(self) -> list[V]
+⋮----
+"""Возвращает список значений по убыванию частоты обращения."""
+⋮----
+def to_dict(self) -> dict[K, V]
+⋮----
+"""Преобразует элементы кэша в словарь по убыванию частоты."""
+⋮----
+def __getitem__(self, key: K) -> V
+⋮----
+"""Возвращает значение по ключу с увеличением частоты через []."""
+⋮----
+def __setitem__(self, key: K, value: V) -> None
+⋮----
+"""Сохраняет пару ключ-значение через []."""
+⋮----
+def __delitem__(self, key: K) -> None
+⋮----
+"""Удаляет элемент по ключу через del."""
+⋮----
+def __contains__(self, key: object) -> bool
+⋮----
+"""Проверяет наличие ключа в кэше без изменения частоты."""
+⋮----
+def __len__(self) -> int
+⋮----
+"""Возвращает текущее количество элементов в кэше."""
+⋮----
+def __iter__(self) -> Iterator[K]
+⋮----
+"""Итерирует по ключам кэша по убыванию частоты обращения."""
+⋮----
+"""Возвращает строковое представление кэша."""
+⋮----
+def __eq__(self, other: object) -> bool
+⋮----
+"""Сравнивает два кэша на равенство по вместимости и элементному составу."""
+</file>
+
 <file path="src/pocket_toolkit/structures/priority_queue.py">
 """Реализация очереди с приоритетами (Priority Queue) на базе бинарной кучи.
 
@@ -5938,60 +6151,41 @@ node_modules/**
 repomix-output.*
 </file>
 
-<file path="CONTRIBUTING.md">
-# Руководство по участию в разработке (Contributing Guide)
+<file path="AGENTS.md">
+> [!NOTE]
+> Данный файл определяет архитектурный контракт, правила оформления кода, стандарты коммитов и регламент ежедневного инкрементального развития библиотеки `pocket-toolkit`. Все агенты обязаны следовать инструкциям при добавлении новых компонентов.
 
-Благодарим за интерес к развитию проекта `pocket-toolkit`!
+# Pocket Toolkit — Operational Contract & Guidelines
 
-## Основные принципы библиотеки
+## 1. Project Overview
+`pocket-toolkit` is a modular, zero-dependency Python utility and data structure library built for modern Python (>=3.12).
+The project evolves through daily, bite-sized, atomic feature increments tracked in [ROADMAP.md](file:///c:/Users/denis/Documents/antigravity/GitHub%20Activity/ROADMAP.md).
 
-1. **Zero Runtime Dependencies** — библиотека не использует внешних зависимостей времени выполнения, опираясь исключительно на стандартную библиотеку Python $\ge 3.12$.
-2. **Строгая типизация (Strict Typing)** — запрещено использование неявных типов и `Any`. Все интерфейсы, параметры функций и возвращаемые значения типизируются явно, включая Generics (`TypeVar`, `Generic`).
-3. **Русскоязычные комментарии и docstrings** — все внутренние комментарии, документация к функциям и модулям пишутся на русском языке. Идентификаторы в коде (переменные, классы, методы) — строго на английском.
-4. **Плоский поток выполнения (Early Returns)** — глубина вложенности не должна превышать 3 уровней.
-5. **Принцип единственной ответственности** — функции должны быть сфокусированными (до 30–40 строк кода).
+## 2. Tech Stack & Environment
+- **Runtime:** Python >= 3.12
+- **Package Manager:** `uv`
+- **Testing:** `pytest`
+- **Git Remote:** `Gupkagrop` (`https://github.com/Gupkagrop/gupkapy-toolkit.git`)
+- **Main Branch:** `main`
 
----
+## 3. Code Standards & Architecture
+- **Language & Comments:** All code symbols (classes, functions, variables, files) must be in English. All docstrings, inline comments, and annotations MUST be in Russian.
+- **Strict Typing:** Every function signature and class attribute must include explicit type hints (`typing.Any` is strictly prohibited). Use generics (`TypeVar`, `Generic`) where appropriate.
+- **Complexity & Flat Flow:** Adhere to early returns (maximum 3 levels of nesting).
+- **Single Responsibility:** Functions must stay within 30-40 lines; break down complex logic into private helper functions (`_helper_func`).
+- **Zero Placeholders:** Never commit mocks, placeholders, or unfinished `TODO` markers. Every added component must be 100% production-ready.
 
-## Локальная разработка
-
-### 1. Подготовка окружения
-Проект управляется пакетным менеджером [uv](https://docs.astral.sh/uv/):
-
-```bash
-# Клонирование репозитория
-git clone https://github.com/Gupkagrop/gupkagropy.git
-cd gupkagropy
-
-# Синхронизация зависимостей разработки
-uv sync
-```
-
-### 2. Запуск тестов
-Каждая функциональность должна быть покрыта тестами с проверкой крайних случаев:
-
-```bash
-uv run pytest
-```
-
-### 3. Проверка качества кода
-Перед коммитом убедитесь, что линтер `ruff` не находит ошибок:
-
-```bash
-uv run ruff check .
-```
-
----
-
-## Стандарт оформления коммитов
-
-Коммиты оформляются по стандарту Conventional Commits с описанием **строго на русском языке**:
-
-* `feat(scope): описание новой функциональности`
-* `fix(scope): исправление ошибки`
-* `docs(scope): обновление документации`
-* `test(scope): добавление или исправление тестов`
-* `chore(scope): служебные задачи, настройки сборки`
+## 4. Daily Increment Workflow (Automation Protocol)
+On each automated daily run:
+1. Open [ROADMAP.md](file:///c:/Users/denis/Documents/antigravity/GitHub%20Activity/ROADMAP.md) and pick the next uncompleted task `[ ]`.
+2. Implement the designated module inside `src/pocket_toolkit/<category>/<module_name>.py`.
+3. Export public symbols in `src/pocket_toolkit/__init__.py` and the respective subpackage `__init__.py`.
+4. Create comprehensive unit tests in `tests/test_<module_name>.py` covering standard cases, edge cases, and error handling.
+5. Run test suite: `uv run pytest`.
+6. Mark the task as done `[x]` in `ROADMAP.md`.
+7. Commit changes strictly in Russian using Conventional Commits format:
+   - Example: `feat(structures): реализовать кольцевой буфер и модульные тесты`
+8. Push commits to GitHub: `git push Gupkagrop main`.
 </file>
 
 <file path="LICENSE">
@@ -6004,42 +6198,6 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-</file>
-
-<file path="SECURITY.md">
-# Политика безопасности (Security Policy)
-
-Команда проекта серьезно относится к безопасности и надежности кодовой базы `pocket-toolkit`.
-
-## Поддерживаемые версии
-
-Исправления безопасности выпускаются для следующих версий:
-
-| Версия | Поддержка | Примечание |
-|---|:---:|---|
-| `1.0.x` | :white_check_mark: | Текущая стабильная версия (Python $\ge 3.12$) |
-| `< 1.0.0` | :x: | Устаревшие промежуточные сборки |
-
-## Сообщение об уязвимости
-
-Если вы обнаружили потенциальную уязвимость безопасности в библиотеке:
-
-1. **Не создавайте публичный Issue.**
-2. Воспользуйтесь приватной формой сообщения об уязвимости на GitHub:  
-   👉 [Report a vulnerability](https://github.com/Gupkagrop/gupkagropy/security/advisories/new)
-3. Либо отправьте письмо автору на электронную почту: [denislopuhov3@gmail.com](mailto:denislopuhov3@gmail.com) с темой `[SECURITY] Уязвимость в pocket-toolkit`.
-
-### Необходимая информация
-Пожалуйста, включите в отчет:
-- Описание обнаруженной уязвимости и потенциального вектора атаки.
-- Затронутый модуль или функцию (например, `pocket_toolkit.data.evaluate_math`).
-- Минимальный воспроизводимый пример кода.
-- Ваши контактные данные для обратной связи.
-
-### Регламент ответа
-- Первичное подтверждение получения отчета: в течение 48 часов.
-- Оценка критичности и подготовка исправления: до 7 рабочих дней.
-- Публичный выпуск обновленной версии с фиксацией CVE при необходимости.
 </file>
 
 <file path=".github/ISSUE_TEMPLATE/bug_report.md">
@@ -8238,256 +8396,6 @@ current: object = func
 current = current(arg)
 </file>
 
-<file path="src/pocket_toolkit/structures/lfu_cache.py">
-"""Реализация кэша вытеснения по частоте использования (LFU Cache) с временем доступа O(1)."""
-⋮----
-class _LFUEntry[K, V]
-⋮----
-"""Внутренний контейнер для хранения ключа, значения и частоты обращения."""
-⋮----
-__slots__ = ("freq", "key", "value")
-⋮----
-def __init__(self, key: K, value: V, freq: int = 1) -> None
-⋮----
-"""Инициализирует запись кэша LFU.
-
-        :param key: Ключ элемента.
-        :param value: Значение элемента.
-        :param freq: Начальная частота обращения.
-        """
-⋮----
-def __repr__(self) -> str
-⋮----
-"""Строковое представление записи LFU."""
-⋮----
-class LFUCache[K, V]
-⋮----
-"""Кэш вытеснения по частоте использования (Least Frequently Used Cache).
-
-    Обеспечивает алгоритмическую сложность основных операций O(1) за счет
-    комбинации хэш-таблицы (словаря) ключей и словаря двусвязных списков,
-    группирующих элементы по частоте их вызова. При равенстве частот
-    вытесняется наименее недавно использованный элемент (LRU).
-    """
-⋮----
-"""Инициализирует кэш заданной максимальной вместимости.
-
-        :param capacity: Максимальное количество элементов (должно быть строго > 0).
-        :param initial_items: Опциональная последовательность начальных пар (ключ, значение).
-        :raises ValueError: Если вместимость меньше либо равна нулю.
-        """
-⋮----
-@property
-    def capacity(self) -> int
-⋮----
-"""Возвращает максимальную вместимость кэша."""
-⋮----
-@property
-    def size(self) -> int
-⋮----
-"""Возвращает текущее количество сохраненных элементов."""
-⋮----
-@property
-    def hits(self) -> int
-⋮----
-"""Возвращает количество успешных обращений к кэшу."""
-⋮----
-@property
-    def misses(self) -> int
-⋮----
-"""Возвращает количество промахов мимо кэша."""
-⋮----
-@property
-    def hit_ratio(self) -> float
-⋮----
-"""Возвращает долю попаданий в кэш от общего числа запросов."""
-total_requests: int = self._hits + self._misses
-⋮----
-@property
-    def min_freq(self) -> int
-⋮----
-"""Возвращает текущую минимальную частоту элементов в кэше."""
-⋮----
-def is_empty(self) -> bool
-⋮----
-"""Проверяет, пуст ли кэш."""
-⋮----
-def is_full(self) -> bool
-⋮----
-"""Проверяет, заполнен ли кэш до предельной вместимости."""
-⋮----
-def _increment_freq(self, node: DoublyNode[_LFUEntry[K, V]]) -> None
-⋮----
-"""Вспомогательный метод увеличения частоты обращения к узлу за O(1)."""
-entry: _LFUEntry[K, V] = node.value
-old_freq: int = entry.freq
-freq_list: DoublyLinkedList[_LFUEntry[K, V]] = self._freq_map[old_freq]
-⋮----
-new_freq: int = entry.freq
-⋮----
-def _evict_lfu(self) -> _LFUEntry[K, V]
-⋮----
-"""Вспомогательный метод вытеснения наименее часто используемого элемента."""
-freq_list: DoublyLinkedList[_LFUEntry[K, V]] = self._freq_map[self._min_freq]
-evicted_entry: _LFUEntry[K, V] = freq_list.pop()
-⋮----
-def put(self, key: K, value: V) -> None
-⋮----
-"""Помещает пару ключ-значение в кэш.
-
-        Если ключ существует, обновляет значение и увеличивает его частоту.
-        Если кэш заполнен, вытесняет элемент с наименьшей частотой (LFU/LRU).
-
-        :param key: Ключ элемента.
-        :param value: Значение элемента.
-        """
-⋮----
-node: DoublyNode[_LFUEntry[K, V]] = self._lookup[key]
-⋮----
-entry: _LFUEntry[K, V] = _LFUEntry(key, value, freq=1)
-⋮----
-new_node: DoublyNode[_LFUEntry[K, V]] = self._freq_map[1].prepend(entry)
-⋮----
-def get(self, key: K, default: V | None = None) -> V | None
-⋮----
-"""Возвращает значение по ключу, увеличивая счетчик его частоты обращения.
-
-        :param key: Искомый ключ.
-        :param default: Значение по умолчанию, если ключ отсутствует.
-        :return: Значение элемента или default.
-        """
-⋮----
-def get_frequency(self, key: K) -> int | None
-⋮----
-"""Возвращает текущую частоту обращения к ключу.
-
-        :param key: Искомый ключ.
-        :return: Частота обращения к ключу или None, если ключ отсутствует.
-        """
-⋮----
-def peek(self, key: K, default: V | None = None) -> V | None
-⋮----
-"""Возвращает значение по ключу без изменения частоты и статистики.
-
-        :param key: Искомый ключ.
-        :param default: Значение по умолчанию, если ключ отсутствует.
-        :return: Значение элемента или default.
-        """
-⋮----
-def peek_lfu(self) -> tuple[K, V] | None
-⋮----
-"""Возвращает парный кандидат на вытеснение (ключ, значение) без его удаления.
-
-        :return: Кортеж (ключ, значение) или None, если кэш пуст.
-        """
-⋮----
-tail_node: DoublyNode[_LFUEntry[K, V]] | None = freq_list.tail_node
-⋮----
-def pop(self, key: K) -> V
-⋮----
-"""Извлекает и удаляет элемент по ключу из кэша.
-
-        :param key: Ключ удаляемого элемента.
-        :return: Значение удаленного элемента.
-        :raises KeyError: Если ключ не найден в кэше.
-        """
-⋮----
-node: DoublyNode[_LFUEntry[K, V]] = self._lookup.pop(key)
-⋮----
-freq_list: DoublyLinkedList[_LFUEntry[K, V]] = self._freq_map[entry.freq]
-⋮----
-def pop_lfu(self) -> tuple[K, V]
-⋮----
-"""Удаляет и возвращает наименее часто и наименее недавно использованный элемент.
-
-        :return: Кортеж (ключ, значение) вытесненного элемента.
-        :raises KeyError: Если кэш пуст.
-        """
-⋮----
-evicted: _LFUEntry[K, V] = self._evict_lfu()
-⋮----
-def delete(self, key: K) -> bool
-⋮----
-"""Безопасно удаляет элемент по ключу.
-
-        :param key: Удаляемый ключ.
-        :return: True, если элемент присутствовал и был удален; False в противном случае.
-        """
-⋮----
-def resize(self, new_capacity: int) -> int
-⋮----
-"""Изменяет максимальную вместимость кэша.
-
-        Если новая вместимость меньше текущего размера, вытесняет элементы LFU.
-
-        :param new_capacity: Новая вместимость кэша (строго > 0).
-        :return: Количество вытесненных элементов.
-        :raises ValueError: Если new_capacity <= 0.
-        """
-⋮----
-evicted_count: int = 0
-⋮----
-def clear(self, reset_stats: bool = False) -> None
-⋮----
-"""Очищает кэш от всех элементов.
-
-        :param reset_stats: Сбрасывать ли счетчики попаданий и промахов.
-        """
-⋮----
-def reset_stats(self) -> None
-⋮----
-"""Сбрасывает счетчики попаданий и промахов к нулю."""
-⋮----
-def items(self) -> list[tuple[K, V]]
-⋮----
-"""Возвращает список пар (ключ, значение) по убыванию частоты обращения."""
-result: list[tuple[K, V]] = []
-⋮----
-freq_list: DoublyLinkedList[_LFUEntry[K, V]] = self._freq_map[freq]
-⋮----
-def keys(self) -> list[K]
-⋮----
-"""Возвращает список ключей по убыванию частоты обращения."""
-⋮----
-def values(self) -> list[V]
-⋮----
-"""Возвращает список значений по убыванию частоты обращения."""
-⋮----
-def to_dict(self) -> dict[K, V]
-⋮----
-"""Преобразует элементы кэша в словарь по убыванию частоты."""
-⋮----
-def __getitem__(self, key: K) -> V
-⋮----
-"""Возвращает значение по ключу с увеличением частоты через []."""
-⋮----
-def __setitem__(self, key: K, value: V) -> None
-⋮----
-"""Сохраняет пару ключ-значение через []."""
-⋮----
-def __delitem__(self, key: K) -> None
-⋮----
-"""Удаляет элемент по ключу через del."""
-⋮----
-def __contains__(self, key: object) -> bool
-⋮----
-"""Проверяет наличие ключа в кэше без изменения частоты."""
-⋮----
-def __len__(self) -> int
-⋮----
-"""Возвращает текущее количество элементов в кэше."""
-⋮----
-def __iter__(self) -> Iterator[K]
-⋮----
-"""Итерирует по ключам кэша по убыванию частоты обращения."""
-⋮----
-"""Возвращает строковое представление кэша."""
-⋮----
-def __eq__(self, other: object) -> bool
-⋮----
-"""Сравнивает два кэша на равенство по вместимости и элементному составу."""
-</file>
-
 <file path=".gitignore">
 # Python
 __pycache__/
@@ -8521,6 +8429,98 @@ repomix-output.*
 .env
 .env.*
 !.env.example
+</file>
+
+<file path="CONTRIBUTING.md">
+# Руководство по участию в разработке (Contributing Guide)
+
+Благодарим за интерес к развитию проекта `pocket-toolkit`!
+
+## Основные принципы библиотеки
+
+1. **Zero Runtime Dependencies** — библиотека не использует внешних зависимостей времени выполнения, опираясь исключительно на стандартную библиотеку Python $\ge 3.12$.
+2. **Строгая типизация (Strict Typing)** — запрещено использование неявных типов и `Any`. Все интерфейсы, параметры функций и возвращаемые значения типизируются явно, включая Generics (`TypeVar`, `Generic`).
+3. **Русскоязычные комментарии и docstrings** — все внутренние комментарии, документация к функциям и модулям пишутся на русском языке. Идентификаторы в коде (переменные, классы, методы) — строго на английском.
+4. **Плоский поток выполнения (Early Returns)** — глубина вложенности не должна превышать 3 уровней.
+5. **Принцип единственной ответственности** — функции должны быть сфокусированными (до 30–40 строк кода).
+
+---
+
+## Локальная разработка
+
+### 1. Подготовка окружения
+Проект управляется пакетным менеджером [uv](https://docs.astral.sh/uv/):
+
+```bash
+# Клонирование репозитория
+git clone https://github.com/Gupkagrop/gupkapy-toolkit.git
+cd gupkapy-toolkit
+
+# Синхронизация зависимостей разработки
+uv sync
+```
+
+### 2. Запуск тестов
+Каждая функциональность должна быть покрыта тестами с проверкой крайних случаев:
+
+```bash
+uv run pytest
+```
+
+### 3. Проверка качества кода
+Перед коммитом убедитесь, что линтер `ruff` не находит ошибок:
+
+```bash
+uv run ruff check .
+```
+
+---
+
+## Стандарт оформления коммитов
+
+Коммиты оформляются по стандарту Conventional Commits с описанием **строго на русском языке**:
+
+* `feat(scope): описание новой функциональности`
+* `fix(scope): исправление ошибки`
+* `docs(scope): обновление документации`
+* `test(scope): добавление или исправление тестов`
+* `chore(scope): служебные задачи, настройки сборки`
+</file>
+
+<file path="SECURITY.md">
+# Политика безопасности (Security Policy)
+
+Команда проекта серьезно относится к безопасности и надежности кодовой базы `pocket-toolkit`.
+
+## Поддерживаемые версии
+
+Исправления безопасности выпускаются для следующих версий:
+
+| Версия | Поддержка | Примечание |
+|---|:---:|---|
+| `1.0.x` | :white_check_mark: | Текущая стабильная версия (Python $\ge 3.12$) |
+| `< 1.0.0` | :x: | Устаревшие промежуточные сборки |
+
+## Сообщение об уязвимости
+
+Если вы обнаружили потенциальную уязвимость безопасности в библиотеке:
+
+1. **Не создавайте публичный Issue.**
+2. Воспользуйтесь приватной формой сообщения об уязвимости на GitHub:  
+   👉 [Report a vulnerability](https://github.com/Gupkagrop/gupkapy-toolkit/security/advisories/new)
+3. Либо отправьте письмо автору на электронную почту: [denislopuhov3@gmail.com](mailto:denislopuhov3@gmail.com) с темой `[SECURITY] Уязвимость в pocket-toolkit`.
+
+### Необходимая информация
+Пожалуйста, включите в отчет:
+- Описание обнаруженной уязвимости и потенциального вектора атаки.
+- Затронутый модуль или функцию (например, `pocket_toolkit.data.evaluate_math`).
+- Минимальный воспроизводимый пример кода.
+- Ваши контактные данные для обратной связи.
+
+### Регламент ответа
+- Первичное подтверждение получения отчета: в течение 48 часов.
+- Оценка критичности и подготовка исправления: до 7 рабочих дней.
+- Публичный выпуск обновленной версии с фиксацией CVE при необходимости.
 </file>
 
 <file path="pyproject.toml">
@@ -8557,10 +8557,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Gupkagrop/gupkagropy"
-Repository = "https://github.com/Gupkagrop/gupkagropy.git"
-Issues = "https://github.com/Gupkagrop/gupkagropy/issues"
-Changelog = "https://github.com/Gupkagrop/gupkagropy/blob/main/ROADMAP.md"
+Homepage = "https://github.com/Gupkagrop/gupkapy-toolkit"
+Repository = "https://github.com/Gupkagrop/gupkapy-toolkit.git"
+Issues = "https://github.com/Gupkagrop/gupkapy-toolkit/issues"
+Changelog = "https://github.com/Gupkagrop/gupkapy-toolkit/blob/main/ROADMAP.md"
 
 [build-system]
 requires = ["uv_build>=0.12.15,<0.13.0"]
@@ -8588,17 +8588,15 @@ __all__: list[str] = [
 <file path="README.md">
 <div align="center">
 
-# 🧰 Gupkagropy
-
-> **G.U.P.K.A.G.R.O.P.** — **G**eneric **U**tilities & **P**ython **K**ernel for **A**lgorithms, **G**uarded **R**esilience & **O**perational **P**rimitives.
+# 🧰 GupkaPy Toolkit
 
 **Модульная, строго типизированная библиотека легковесных структур данных, алгоритмов и прикладных утилит на чистом Python ($\ge 3.12$) без внешних зависимостей времени выполнения.**
 
-[![CI](https://github.com/Gupkagrop/gupkagropy/actions/workflows/ci.yml/badge.svg)](https://github.com/Gupkagrop/gupkagropy/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/Gupkagrop/gupkagropy?color=007ec6&logo=github)](https://github.com/Gupkagrop/gupkagropy/releases)
+[![CI](https://github.com/Gupkagrop/gupkapy-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/Gupkagrop/gupkapy-toolkit/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Gupkagrop/gupkapy-toolkit?color=007ec6&logo=github)](https://github.com/Gupkagrop/gupkapy-toolkit/releases)
 [![Roadmap](https://img.shields.io/badge/Roadmap-60%2F60%20Completed-brightgreen.svg?style=flat)](ROADMAP.md)
 [![Python 3.12 | 3.13](https://img.shields.io/badge/Python-3.12%20%7C%203.13-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-623%20passed-success.svg?style=flat&logo=pytest&logoColor=white)](https://github.com/Gupkagrop/gupkagropy/actions)
+[![Tests](https://img.shields.io/badge/Tests-623%20passed-success.svg?style=flat&logo=pytest&logoColor=white)](https://github.com/Gupkagrop/gupkapy-toolkit/actions)
 [![Dependencies](https://img.shields.io/badge/Dependencies-0%20(Pure%20Python)-blueviolet.svg?style=flat)](pyproject.toml)
 [![Typing](https://img.shields.io/badge/Typing-Strict%20(0%20Any)-2ba244.svg?style=flat)](src/pocket_toolkit)
 [![Code style](https://img.shields.io/badge/Code%20Style-Ruff-black.svg?style=flat&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
@@ -8780,8 +8778,8 @@ bus.publish("user.login", {"user_id": 42})
 ### Клонирование и настройка окружения
 ```bash
 # Клонирование репозитория
-git clone https://github.com/Gupkagrop/gupkagropy.git
-cd gupkagropy
+git clone https://github.com/Gupkagrop/gupkapy-toolkit.git
+cd gupkapy-toolkit
 
 # Синхронизация зависимостей окружения разработки
 uv sync

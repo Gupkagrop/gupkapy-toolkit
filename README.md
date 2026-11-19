@@ -1,16 +1,14 @@
 <div align="center">
 
-# 🧰 Gupkagropy
-
-> **G.U.P.K.A.G.R.O.P.** — **G**eneric **U**tilities & **P**ython **K**ernel for **A**lgorithms, **G**uarded **R**esilience & **O**perational **P**rimitives.
+# 🧰 GupkaPy Toolkit
 
 **Модульная, строго типизированная библиотека легковесных структур данных, алгоритмов и прикладных утилит на чистом Python ($\ge 3.12$) без внешних зависимостей времени выполнения.**
 
-[![CI](https://github.com/Gupkagrop/gupkagropy/actions/workflows/ci.yml/badge.svg)](https://github.com/Gupkagrop/gupkagropy/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/Gupkagrop/gupkagropy?color=007ec6&logo=github)](https://github.com/Gupkagrop/gupkagropy/releases)
+[![CI](https://github.com/Gupkagrop/gupkapy-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/Gupkagrop/gupkapy-toolkit/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Gupkagrop/gupkapy-toolkit?color=007ec6&logo=github)](https://github.com/Gupkagrop/gupkapy-toolkit/releases)
 [![Roadmap](https://img.shields.io/badge/Roadmap-60%2F60%20Completed-brightgreen.svg?style=flat)](ROADMAP.md)
 [![Python 3.12 | 3.13](https://img.shields.io/badge/Python-3.12%20%7C%203.13-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-623%20passed-success.svg?style=flat&logo=pytest&logoColor=white)](https://github.com/Gupkagrop/gupkagropy/actions)
+[![Tests](https://img.shields.io/badge/Tests-623%20passed-success.svg?style=flat&logo=pytest&logoColor=white)](https://github.com/Gupkagrop/gupkapy-toolkit/actions)
 [![Dependencies](https://img.shields.io/badge/Dependencies-0%20(Pure%20Python)-blueviolet.svg?style=flat)](pyproject.toml)
 [![Typing](https://img.shields.io/badge/Typing-Strict%20(0%20Any)-2ba244.svg?style=flat)](src/pocket_toolkit)
 [![Code style](https://img.shields.io/badge/Code%20Style-Ruff-black.svg?style=flat&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
@@ -192,8 +190,8 @@ bus.publish("user.login", {"user_id": 42})
 ### Клонирование и настройка окружения
 ```bash
 # Клонирование репозитория
-git clone https://github.com/Gupkagrop/gupkagropy.git
-cd gupkagropy
+git clone https://github.com/Gupkagrop/gupkapy-toolkit.git
+cd gupkapy-toolkit
 
 # Синхронизация зависимостей окружения разработки
 uv sync

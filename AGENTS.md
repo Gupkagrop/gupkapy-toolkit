@@ -11,7 +11,7 @@ The project evolves through daily, bite-sized, atomic feature increments tracked
 - **Runtime:** Python >= 3.12
 - **Package Manager:** `uv`
 - **Testing:** `pytest`
-- **Git Remote:** `Gupkagrop` (`https://github.com/Gupkagrop/gupkagropy.git`)
+- **Git Remote:** `Gupkagrop` (`https://github.com/Gupkagrop/gupkapy-toolkit.git`)
 - **Main Branch:** `main`
 
 ## 3. Code Standards & Architecture
