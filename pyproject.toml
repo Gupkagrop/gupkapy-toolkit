@@ -1,13 +1,40 @@
 [project]
 name = "pocket-toolkit"
 version = "0.1.0"
-description = "Add your description here"
+description = "Высокопроизводительная библиотека структур данных, алгоритмов и утилит на чистом Python 3.12+ (Zero-Dependencies)"
 readme = "README.md"
+license = { text = "MIT" }
 authors = [
     { name = "Gupkagrop", email = "denislopuhov3@gmail.com" }
 ]
 requires-python = ">=3.12"
 dependencies = []
+keywords = [
+    "data-structures",
+    "algorithms",
+    "toolkit",
+    "zero-dependencies",
+    "lru-cache",
+    "circuit-breaker",
+    "rate-limiter",
+    "utilities",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/Gupkagrop/important-project"
+Repository = "https://github.com/Gupkagrop/important-project.git"
+Issues = "https://github.com/Gupkagrop/important-project/issues"
+Changelog = "https://github.com/Gupkagrop/important-project/blob/main/ROADMAP.md"
 
 [build-system]
 requires = ["uv_build>=0.12.15,<0.13.0"]
