@@ -1,32 +1,59 @@
-# Python
+# Standard Git Ignore for Python, Windows Desktop & Web
+
+# Environment Secrets
+.env
+.env.*
+!.env.example
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Ephemeral Agent Artifacts (Strictly never commit to Git)
+repomix-output.*
+
+# Python & Dependencies
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-
-# Virtual Environment
 .venv/
 env/
 venv/
 ENV/
+packages/
+node_modules/
 
 # Testing & Coverage
 .pytest_cache/
+.ruff_cache/
 .coverage
 htmlcov/
 
-# Distribution & Build
-build/
+# Build & Compiled Outputs
 dist/
+build/
+out/
+bin/
+obj/
+target/
 *.egg-info/
+*.exe
+*.dll
+*.msi
 
-# Logs
+# Logs & Diagnostics
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
 
-# Ephemeral artifacts & secrets
-repomix-output.*
-.env
-.env.*
-!.env.example
+# IDE & OS Files
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+[Dd]esktop.ini
+$RECYCLE.BIN/

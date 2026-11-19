@@ -7,17 +7,16 @@
 
 import copy
 from collections.abc import Mapping
-from typing import Any
 
 # Специальный объект-маркер для явного удаления ключей в deep_patch
 DELETE_FIELD: object = object()
 
 
 def deep_merge(
-    target: Mapping[str, Any],
-    *sources: Mapping[str, Any],
+    target: Mapping[str, object],
+    *sources: Mapping[str, object],
     list_strategy: str = "replace",
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Рекурсивно объединяет несколько словарей в новый словарь без мутации исходных.
 
     :param target: Базовый словарь.
@@ -36,7 +35,7 @@ def deep_merge(
             f"Допустимы: {', '.join(valid_strategies)}"
         )
 
-    result: dict[str, Any] = copy.deepcopy(dict(target))
+    result: dict[str, object] = copy.deepcopy(dict(target))
 
     for source in sources:
         if not isinstance(source, Mapping):
@@ -53,8 +52,8 @@ def deep_merge(
                 elif list_strategy == "concat":
                     result[key] = copy.deepcopy(result[key] + val)
                 elif list_strategy == "union":
-                    combined: list[Any] = []
-                    seen: set[Any] = set()
+                    combined: list[object] = []
+                    seen: set[object] = set()
                     for item in result[key] + val:
                         # Для хешируемых типов используем seen, для нехешируемых — линейную проверку
                         try:
@@ -72,10 +71,10 @@ def deep_merge(
 
 
 def deep_patch(
-    target: Mapping[str, Any],
-    patch: Mapping[str, Any],
-    delete_marker: Any = DELETE_FIELD,
-) -> dict[str, Any]:
+    target: Mapping[str, object],
+    patch: Mapping[str, object],
+    delete_marker: object = DELETE_FIELD,
+) -> dict[str, object]:
     """Применяет дельта-патч к словарю по стандарту RFC 7396 JSON Merge Patch.
 
     Если значение ключа в patch равно delete_marker (по умолчанию DELETE_FIELD),
@@ -91,7 +90,7 @@ def deep_patch(
     if not isinstance(target, Mapping) or not isinstance(patch, Mapping):
         raise TypeError("target и patch должны быть типа Mapping")
 
-    result: dict[str, Any] = copy.deepcopy(dict(target))
+    result: dict[str, object] = copy.deepcopy(dict(target))
 
     for key, val in patch.items():
         if val is delete_marker:

@@ -6,15 +6,14 @@
 """
 
 from collections.abc import Mapping
-from typing import Any
 
 
 def flatten_dict(
-    data: Mapping[str, Any],
+    data: Mapping[str, object],
     sep: str = ".",
     max_depth: int | None = None,
     flatten_lists: bool = True,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Преобразует глубоко вложенный словарь в плоский словарь с составными ключами.
 
     :param data: Вложенный словарь данных.
@@ -28,9 +27,9 @@ def flatten_dict(
     if not sep:
         raise ValueError("Разделитель sep не может быть пустой строкой")
 
-    result: dict[str, Any] = {}
+    result: dict[str, object] = {}
 
-    def _flatten(current: Any, prefix: str, depth: int) -> None:
+    def _flatten(current: object, prefix: str, depth: int) -> None:
         reached_limit = max_depth is not None and depth >= max_depth
 
         if isinstance(current, Mapping) and current and not reached_limit:
@@ -56,7 +55,7 @@ def flatten_dict(
     return result
 
 
-def _convert_contiguous_numeric_keys(obj: Any) -> Any:
+def _convert_contiguous_numeric_keys(obj: object) -> object:
     """Рекурсивно преобразует словари с непрерывными целочисленными ключами '0', '1', ... в списки."""
     if not isinstance(obj, dict):
         return obj
@@ -84,10 +83,10 @@ def _convert_contiguous_numeric_keys(obj: Any) -> Any:
 
 
 def unflatten_dict(
-    flat_data: Mapping[str, Any],
+    flat_data: Mapping[str, object],
     sep: str = ".",
     parse_lists: bool = True,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Восстанавливает иерархический вложенный словарь из плоского словаря.
 
     :param flat_data: Плоский словарь с составными ключами.
@@ -100,7 +99,7 @@ def unflatten_dict(
     if not sep:
         raise ValueError("Разделитель sep не может быть пустой строкой")
 
-    root: dict[str, Any] = {}
+    root: dict[str, object] = {}
 
     for composite_key, value in flat_data.items():
         parts = composite_key.split(sep)
@@ -109,7 +108,9 @@ def unflatten_dict(
         for part in parts[:-1]:
             if part not in current or not isinstance(current[part], dict):
                 current[part] = {}
-            current = current[part]
+            nested = current[part]
+            if isinstance(nested, dict):
+                current = nested
 
         current[parts[-1]] = value
 
