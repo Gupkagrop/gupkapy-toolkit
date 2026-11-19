@@ -126,6 +126,16 @@ function Invoke-ActivityPulse {
 
 # 4. Функция выполнения задачи через Gemini CLI по ROADMAP.md
 function Invoke-GeminiRoadmap {
+    # Проверка наличия незавершенных этапов в ROADMAP.md
+    $roadmapPath = Join-Path $ProjectRoot "ROADMAP.md"
+    if (Test-Path $roadmapPath) {
+        $pendingTasks = Select-String -Path $roadmapPath -Pattern '^\s*-\s*\[\s*\]'
+        if (-not $pendingTasks) {
+            Write-Log "Все задачи в ROADMAP.md успешно выполнены (60/60, 100%). Разработка завершена!" "SUCCESS"
+            return $false
+        }
+    }
+
     Write-Log "Поиск установленного Gemini CLI..." "INFO"
     $geminiCmd = Get-Command "gemini.cmd" -ErrorAction SilentlyContinue
 

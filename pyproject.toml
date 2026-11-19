@@ -1,6 +1,6 @@
 [project]
 name = "pocket-toolkit"
-version = "0.1.0"
+version = "1.0.0"
 description = "Высокопроизводительная библиотека структур данных, алгоритмов и утилит на чистом Python 3.12+ (Zero-Dependencies)"
 readme = "README.md"
 license = { text = "MIT" }

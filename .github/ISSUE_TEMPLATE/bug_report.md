@@ -27,4 +27,4 @@ from pocket_toolkit import ...
 ### Окружение
 - **ОС:** Windows / Linux / macOS
 - **Версия Python:** 3.12 / 3.13 / 3.14
-- **Версия pocket-toolkit:** 0.1.0
+- **Версия pocket-toolkit:** 1.0.0
